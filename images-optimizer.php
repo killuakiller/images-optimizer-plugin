@@ -10,6 +10,28 @@ defined( 'ABSPATH' ) || exit;
 
 define( 'IMGOPT_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 
+/**
+ * Self-update from the private GitHub repo (killuakiller/images-optimizer-plugin).
+ *
+ * IMGOPT_GH_TOKEN is a read-only, repo-scoped GitHub fine-grained token,
+ * defined in wp-config.php. Without it, this site just won't see update
+ * notices (repo is private) but nothing else breaks.
+ */
+if ( is_admin() ) {
+	require_once IMGOPT_PLUGIN_DIR . 'includes/plugin-update-checker/plugin-update-checker.php';
+
+	$imgoptUpdateChecker = YahnisElsts\PluginUpdateChecker\v5\PucFactory::buildUpdateChecker(
+		'https://github.com/killuakiller/images-optimizer-plugin/',
+		__FILE__,
+		'images-optimizer-plugin'
+	);
+	$imgoptUpdateChecker->setBranch( 'main' );
+
+	if ( defined( 'IMGOPT_GH_TOKEN' ) && IMGOPT_GH_TOKEN ) {
+		$imgoptUpdateChecker->setAuthentication( IMGOPT_GH_TOKEN );
+	}
+}
+
 require_once IMGOPT_PLUGIN_DIR . 'includes/formats.php';
 require_once IMGOPT_PLUGIN_DIR . 'includes/scaled-fixup.php';
 require_once IMGOPT_PLUGIN_DIR . 'includes/dashboard.php';
